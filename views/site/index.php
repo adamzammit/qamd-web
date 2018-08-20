@@ -1,5 +1,6 @@
 <?php
 use yii\widgets\ActiveForm;
+use kartik\file\FileInput;
 
 /* @var $this yii\web\View */
 
@@ -14,7 +15,7 @@ $this->title = 'Web frontend for QAMyData Tool';
 
 <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]) ?>
 
-    <?= $form->field($model, 'file')->fileInput() ?>
+    <?= $form->field($model, 'file')->widget(FileInput::classname()) ?>
 
     <button class="btn btn-lg btn-success">Upload</button>
 
