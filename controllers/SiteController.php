@@ -68,10 +68,14 @@ class SiteController extends Controller
         $model = new UploadForm();
 
         if (Yii::$app->request->isPost) {
-            $model->imageFile = UploadedFile::getInstance($model, 'imageFile');
-            if ($model->upload()) {
+            $model->file = UploadedFile::getInstance($model, 'file');
+            if (is_array($return = $model->upload())) {
                 // file is uploaded successfully
-                return;
+				//execute qamd and display output to user
+                $webpath = realpath(dirname(__FILE__).'/../web') . "/" . $return["key"] . "/";
+				mkdir($webpath);
+                exec("qamd -l -p -o " . $webpath . "index.html --output-format html " . $return["path"] . $return["file"]);
+                return $this->redirect("/" . $key);
             }
         }
 
