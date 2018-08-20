@@ -26,10 +26,10 @@ $this->title = 'Web frontend for QAMyData Tool';
     <div class="body-content">
 
         <div class="row">
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <h2>About</h2>
 
-                <p>QAMyData is a dta quality assurance tool for SPSS, STATA and SAS files. qamd-web is a web front end, running on the Yii2 framework for this tool</p>
+                <p><a href="https://github.com/Raymanns/qamd">QAMyData</a> is a data quality assurance tool for SPSS, STATA and SAS files. <a href="https://github.com/adamzammit/qamd-web">qamd-web</a> is a web front end, running on the Yii2 framework in a Docker container for easy access to the tool.</p>
 
             </div>
         </div>
