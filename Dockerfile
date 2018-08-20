@@ -133,10 +133,10 @@ WORKDIR /var/www/html
 # Composer packages are installed outside the app directory /var/www/html.
 # This way developers can mount the source code from their host directory
 # into /var/www/html and won't end up with an empty vendors/ directory.
-#COPY composer.json /var/www/html/
-#COPY composer.lock /var/www/html/
-#RUN composer install --prefer-dist --no-progress \
-#    && rm composer.*
+COPY composer.json /var/www/html/
+COPY composer.lock /var/www/html/
+RUN composer install --prefer-dist --no-progress \
+    && rm composer.*
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
