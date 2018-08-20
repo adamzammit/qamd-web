@@ -7,6 +7,7 @@ $config = [
     'id' => 'basic',
     'name' => 'qamd-web',
     'basePath' => dirname(__DIR__),
+    'vendorPath' => '/var/www/vendor',
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',

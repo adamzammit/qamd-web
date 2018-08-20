@@ -31,6 +31,7 @@
     },
     "config": {
         "process-timeout": 1800,
+        "vendor-dir": "/var/www/vendor",
         "fxp-asset": {
             "enabled": false
         }
