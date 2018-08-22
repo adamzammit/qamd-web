@@ -20,9 +20,11 @@ class UploadForm extends Model
     public function upload()
     {
         if ($this->validate()) {
-            //create a random dir and save to a random file
-            $fname = $this->file->baseName . "." . $this->file->extension;
-			$key = Yii::$app->getSecurity()->generateRandomString();
+            //create a random dir and save to a file with a cleaned filename
+            $baseName = preg_replace('/[^A-Za-z0-9\_]/', '_', $this->file->baseName); // Replace all non alpha/numbers with underscores
+            $baseName = substr($baseName,0,200); //restrict to 200 chars
+            $fname = $baseName . "." . $this->file->extension; //return extension to aid processing
+			$key = Yii::$app->getSecurity()->generateRandomString(); //create a random path to put it
             $uploadpath = realpath(dirname(__FILE__).'/../uploads') . "/" . $key . "/";
             if (mkdir($uploadpath)) {
 	            if ($this->file->saveAs($uploadpath . $fname)) {
