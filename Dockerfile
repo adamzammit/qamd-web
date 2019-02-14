@@ -27,6 +27,7 @@ RUN mkdir -p /usr/share/man/man1 \
             mysql-client \
             sendmail \
             curl \
+            gettext \
 	    libcurl4-gnutls-dev \
         --no-install-recommends \
 
