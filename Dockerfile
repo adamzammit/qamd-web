@@ -11,6 +11,7 @@ RUN mkdir -p /usr/share/man/man1 \
             git \
             build-essential \ 
             gcc \
+            clang \
             autoconf \
             automake \
             libtool \
@@ -29,6 +30,7 @@ RUN mkdir -p /usr/share/man/man1 \
             curl \
             gettext \
             wbritish \
+            libssl-dev \
 	    libcurl4-gnutls-dev \
         --no-install-recommends \
 
@@ -91,18 +93,18 @@ COPY composer /usr/local/bin/composer
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
-    RUST_VERSION=1.28.0
+    RUST_VERSION=1.35.0
 
 RUN set -eux; \
     dpkgArch="$(dpkg --print-architecture)"; \
     case "${dpkgArch##*-}" in \
-        amd64) rustArch='x86_64-unknown-linux-gnu'; rustupSha256='f69dafcca62fe70d7882113e21bb96a2cbdf4fc4636d25337d6de9191bdec8da' ;; \
-        armhf) rustArch='armv7-unknown-linux-gnueabihf'; rustupSha256='eee969b9fd128e8dc9b4ec44acde46735cf8e612d06495e9d022517849aba2d6' ;; \
-        arm64) rustArch='aarch64-unknown-linux-gnu'; rustupSha256='cdc48b7882582fd8475107a406dd86df85c7d72e5deea99ff8940c8e11531285' ;; \
-        i386) rustArch='i686-unknown-linux-gnu'; rustupSha256='3bad3945452509ac28ba4113e198323daab57488d6885bb31ac30c9eecd88825' ;; \
+        amd64) rustArch='x86_64-unknown-linux-gnu'; rustupSha256='a46fe67199b7bcbbde2dcbc23ae08db6f29883e260e23899a88b9073effc9076' ;; \
+        armhf) rustArch='armv7-unknown-linux-gnueabihf'; rustupSha256='6af5abbbae02e13a9acae29593ec58116ab0e3eb893fa0381991e8b0934caea1' ;; \
+        arm64) rustArch='aarch64-unknown-linux-gnu'; rustupSha256='51862e576f064d859546cca5f3d32297092a850861e567327422e65b60877a1b' ;; \
+        i386) rustArch='i686-unknown-linux-gnu'; rustupSha256='91456c3e6b2a3067914b3327f07bc182e2a27c44bff473263ba81174884182be' ;; \
         *) echo >&2 "unsupported architecture: ${dpkgArch}"; exit 1 ;; \
     esac; \
-    url="https://static.rust-lang.org/rustup/archive/1.13.0/${rustArch}/rustup-init"; \
+    url="https://static.rust-lang.org/rustup/archive/1.18.3/${rustArch}/rustup-init"; \
     curl "$url" -sSf -o rustup-init; \
     echo "${rustupSha256} *rustup-init" | sha256sum -c -; \
     chmod +x rustup-init; \
@@ -114,14 +116,7 @@ RUN set -eux; \
     rustc --version;
 
 RUN cd /usr/src \
-    && git clone https://github.com/WizardMac/ReadStat.git \
     && git clone https://github.com/Raymanns/qamd.git
-
-RUN cd /usr/src/ReadStat \
-    && ./autogen.sh \
-    && ./configure \
-    && make \
-    && make install
 
 RUN cd /usr/src/qamd \
     && cargo build --release

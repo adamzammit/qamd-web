@@ -9,7 +9,7 @@ services:
     links:
       - web
     ports:
-      - "127.0.0.1:8015:6081"
+      - "127.0.0.1:8000:6081"
     environment:
       BACKENDS: "web"
       BACKENDS_PORT: "80"

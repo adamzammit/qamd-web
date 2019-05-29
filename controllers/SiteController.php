@@ -48,7 +48,7 @@ class SiteController extends Controller
                 //execute qamd and display output to user
                 $webpath = realpath(dirname(__FILE__).'/../web') . "/" . $return["key"] . "/";
                 mkdir($webpath);
-                exec("qamd -l -p -o " . $webpath . "index.html --output-format html " . $return["path"] . $return["file"]);
+                exec("qamd run -p -o " . $webpath . "index.html --output-format html " . $return["path"] . $return["file"]);
                 //if index.html failed to generate - generate error page
                 if (!file_exists($webpath . "index.html")) {
                     file_put_contents($webpath . "index.html"," <!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Error</title></head><body><p>There was an error processing {$return["file"]}</p></body></html>");
@@ -59,11 +59,11 @@ class SiteController extends Controller
                             "https://code.jquery.com/jquery-3.3.1.slim.min.js",
                             "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js",
                             "https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css");
-                $replace = array("../js/bootstrap.min.js".
+                $replace = array("../js/bootstrap.min.js",
                     "../js/jquery-3.3.1.slim.min.js",
                     "../js/popper.min.js",
-                    "../css/boostrap.min.css");
-                str_replace($find,$replace,$index);
+                    "../css/bootstrap.min.css");
+                $index = str_replace($find,$replace,$index);
                 file_put_contents($webpath . "index.html",$index);
 				//remove temporary files
 				unlink($return["path"] . $return["file"]);
