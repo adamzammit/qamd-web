@@ -49,6 +49,18 @@ class SiteController extends Controller
                 $webpath = realpath(dirname(__FILE__).'/../web') . "/" . $return["key"] . "/";
 				mkdir($webpath);
                 exec("qamd -l -p -o " . $webpath . "index.html --output-format html " . $return["path"] . $return["file"]);
+                //rewrite index.html to point to local files
+                $index = file_get_contents($webpath . "index.html");
+                $find = array("https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js",
+                            "https://code.jquery.com/jquery-3.3.1.slim.min.js",
+                            "https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js",
+                            "https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css");
+                $replace = array("../js/bootstrap.min.js".
+                    "../js/jquery-3.3.1.slim.min.js",
+                    "../js/popper.min.js",
+                    "../css/boostrap.min.css");
+                str_replace($find,$replace,$index);
+                file_put_contents($webpath . "index.html",$index);
 				//remove temporary files
 				unlink($return["path"] . $return["file"]);
 				rmdir($return["path"]);
