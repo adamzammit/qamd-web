@@ -45,10 +45,14 @@ class SiteController extends Controller
             $model->file = UploadedFile::getInstance($model, 'file');
             if (is_array($return = $model->upload())) {
                 // file is uploaded successfully
-				//execute qamd and display output to user
+                //execute qamd and display output to user
                 $webpath = realpath(dirname(__FILE__).'/../web') . "/" . $return["key"] . "/";
-				mkdir($webpath);
+                mkdir($webpath);
                 exec("qamd -l -p -o " . $webpath . "index.html --output-format html " . $return["path"] . $return["file"]);
+                //if index.html failed to generate - generate error page
+                if (!file_exists($webpath . "index.html")) {
+                    file_put_contents($webpath . "index.html"," <!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Error</title></head><body><p>There was an error processing {$return["file"]}</p></body></html>");
+                }
                 //rewrite index.html to point to local files
                 $index = file_get_contents($webpath . "index.html");
                 $find = array("https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js",

@@ -24,14 +24,14 @@ class UploadForm extends Model
             $baseName = preg_replace('/[^A-Za-z0-9\_]/', '_', $this->file->baseName); // Replace all non alpha/numbers with underscores
             $baseName = substr($baseName,0,200); //restrict to 200 chars
             $fname = $baseName . "." . $this->file->extension; //return extension to aid processing
-			$key = Yii::$app->getSecurity()->generateRandomString(); //create a random path to put it
+            $key = Yii::$app->getSecurity()->generateRandomString(); //create a random path to put it
             $uploadpath = realpath(dirname(__FILE__).'/../uploads') . "/" . $key . "/";
             if (mkdir($uploadpath)) {
-	            if ($this->file->saveAs($uploadpath . $fname)) {
-					return ["path" => $uploadpath, "file" => $fname, "key" => $key];
-				}
+                if ($this->file->saveAs($uploadpath . $fname)) {
+                    return ["path" => $uploadpath, "file" => $fname, "key" => $key];
+                }
             }
         }
-		return false;
+        return false;
    }
 }
