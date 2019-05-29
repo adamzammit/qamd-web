@@ -17,6 +17,7 @@ services:
     restart: always
 
   web:
+    build: .
     image: acspri/qamd-web
     volumes:
       - ./:/var/www/html/
