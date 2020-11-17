@@ -1,4 +1,4 @@
-FROM php:7.1-apache
+FROM php:7.3-apache
 
 MAINTAINER adam.zammit@acspri.org.au
 
@@ -11,12 +11,13 @@ RUN mkdir -p /usr/share/man/man1 \
             git \
             build-essential \ 
             gcc \
+            clang \
             autoconf \
             automake \
             libtool \
-            llvm-3.9-dev \
-            libclang-3.9-dev \
-            clang-3.9 \
+            llvm-7-dev \
+            libclang-7-dev \
+            clang-7 \
             g++ \
             libicu-dev \
             libmcrypt-dev \
@@ -24,9 +25,15 @@ RUN mkdir -p /usr/share/man/man1 \
             libpng-dev \ 
             libjpeg-dev \
             unzip \
-            mysql-client \
+            libzip-dev \
+            mariadb-client \
             sendmail \
             curl \
+            gpg \
+            gpg-agent \
+            gettext \
+            wbritish \
+            libssl-dev \
 	    libcurl4-gnutls-dev \
         --no-install-recommends \
 
@@ -36,7 +43,6 @@ RUN mkdir -p /usr/share/man/man1 \
     # Install PHP extensions
     && docker-php-ext-install intl \
     && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install mcrypt \
     && docker-php-ext-install mysqli \
     && docker-php-ext-install mbstring \
     && docker-php-ext-install opcache \
@@ -44,12 +50,16 @@ RUN mkdir -p /usr/share/man/man1 \
     && docker-php-ext-install curl \
     && docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
     && docker-php-ext-install gd \
-    && pecl install apcu-5.1.8 && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini \
-
-    && rm -r /var/lib/apt/lists/* \
+    && pecl install apcu-5.1.19 && echo extension=apcu.so > /usr/local/etc/php/conf.d/apcu.ini \
+    && pecl install mcrypt-1.0.3 \
+    && docker-php-ext-enable mcrypt \
 
     # Fix write permissions with shared folders
     && usermod -u 1000 www-data
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt update && apt -y install yarn && rm -r /var/lib/apt/lists/* 
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
@@ -74,9 +84,9 @@ RUN { \
 	} > /usr/local/etc/php/conf.d/uploads.ini
 
 # Next composer and global composer package, as their versions may change from time to time
-RUN curl -sS https://getcomposer.org/installer | php \
+RUN curl -sS https://getcomposer.org/installer | php -- --version-1.10.17 --filename=composer.phar \
     && mv composer.phar /usr/local/bin/composer.phar \
-    && composer.phar global require --no-progress "fxp/composer-asset-plugin:~1.2.2" \
+    && composer.phar global require --no-progress "fxp/composer-asset-plugin:~1.4.6" \
     && composer.phar global require --no-progress "codeception/codeception=2.0.*" \
     && composer.phar global require --no-progress "codeception/specify=*" \
     && composer.phar global require --no-progress "codeception/verify=*"
@@ -89,22 +99,22 @@ COPY composer /usr/local/bin/composer
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
-    RUST_VERSION=1.28.0
+    RUST_VERSION=1.40.0
 
 RUN set -eux; \
     dpkgArch="$(dpkg --print-architecture)"; \
     case "${dpkgArch##*-}" in \
-        amd64) rustArch='x86_64-unknown-linux-gnu'; rustupSha256='f69dafcca62fe70d7882113e21bb96a2cbdf4fc4636d25337d6de9191bdec8da' ;; \
-        armhf) rustArch='armv7-unknown-linux-gnueabihf'; rustupSha256='eee969b9fd128e8dc9b4ec44acde46735cf8e612d06495e9d022517849aba2d6' ;; \
-        arm64) rustArch='aarch64-unknown-linux-gnu'; rustupSha256='cdc48b7882582fd8475107a406dd86df85c7d72e5deea99ff8940c8e11531285' ;; \
-        i386) rustArch='i686-unknown-linux-gnu'; rustupSha256='3bad3945452509ac28ba4113e198323daab57488d6885bb31ac30c9eecd88825' ;; \
+        amd64) rustArch='x86_64-unknown-linux-gnu'; rustupSha256='49c96f3f74be82f4752b8bffcf81961dea5e6e94ce1ccba94435f12e871c3bdb' ;; \
+        armhf) rustArch='armv7-unknown-linux-gnueabihf'; rustupSha256='5a2be2919319e8778698fa9998002d1ec720efe7cb4f6ee4affb006b5e73f1be' ;; \
+        arm64) rustArch='aarch64-unknown-linux-gnu'; rustupSha256='d93ef6f91dab8299f46eef26a56c2d97c66271cea60bf004f2f088a86a697078' ;; \
+        i386) rustArch='i686-unknown-linux-gnu'; rustupSha256='e3d0ae3cfce5c6941f74fed61ca83e53d4cd2deb431b906cbd0687f246efede4' ;; \
         *) echo >&2 "unsupported architecture: ${dpkgArch}"; exit 1 ;; \
     esac; \
-    url="https://static.rust-lang.org/rustup/archive/1.13.0/${rustArch}/rustup-init"; \
-    curl "$url" -sSf -o rustup-init; \
+    url="https://static.rust-lang.org/rustup/archive/1.22.1/${rustArch}/rustup-init"; \
+    curl "$url" -o rustup-init; \
     echo "${rustupSha256} *rustup-init" | sha256sum -c -; \
     chmod +x rustup-init; \
-    ./rustup-init -y --no-modify-path --default-toolchain $RUST_VERSION; \
+    ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host ${rustArch}; \
     rm rustup-init; \
     chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
     rustup --version; \
@@ -112,16 +122,10 @@ RUN set -eux; \
     rustc --version;
 
 RUN cd /usr/src \
-    && git clone https://github.com/WizardMac/ReadStat.git \
     && git clone https://github.com/Raymanns/qamd.git
 
-RUN cd /usr/src/ReadStat \
-    && ./autogen.sh \
-    && ./configure \
-    && make \
-    && make install
-
 RUN cd /usr/src/qamd \
+    && yarn \
     && cargo build --release
 
 RUN ldconfig
@@ -134,7 +138,7 @@ WORKDIR /var/www/html
 # This way developers can mount the source code from their host directory
 # into /var/www/html and won't end up with an empty vendors/ directory.
 COPY composer.json /var/www/html/
-COPY composer.lock /var/www/html/
+#COPY composer.lock /var/www/html/
 RUN composer install --prefer-dist --no-progress \
     && rm composer.*
 

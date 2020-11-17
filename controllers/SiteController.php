@@ -48,7 +48,7 @@ class SiteController extends Controller
 				//execute qamd and display output to user
                 $webpath = realpath(dirname(__FILE__).'/../web') . "/" . $return["key"] . "/";
 				mkdir($webpath);
-                exec("qamd -l -p -o " . $webpath . "index.html --output-format html " . $return["path"] . $return["file"]);
+                exec("qamd run -p -o " . $webpath . "index.html --output-format html " . $return["path"] . $return["file"]);
 				//remove temporary files
 				unlink($return["path"] . $return["file"]);
 				rmdir($return["path"]);
