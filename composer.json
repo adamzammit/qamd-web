@@ -18,7 +18,8 @@
         "yiisoft/yii2": "~2.0.39",
         "yiisoft/yii2-bootstrap": "~2.0.0",
         "yiisoft/yii2-swiftmailer": "~2.0.0",
-        "kartik-v/yii2-widget-fileinput": "@dev"
+        "kartik-v/yii2-widget-fileinput": "@dev",
+	"sitawit/yii2-piwik": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
